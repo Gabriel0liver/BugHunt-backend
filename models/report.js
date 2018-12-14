@@ -19,6 +19,10 @@ const reportSchema = new Schema({
   developer:{
     type: ObjectId,
     required: true
+  },
+  status:{
+    type: String,
+    required: true
   }
 });
 

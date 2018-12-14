@@ -41,7 +41,7 @@ router.delete('/:id', (req, res, next) => {
 
   Report.findById(req.params.id)
     .then(response => {
-      if(response.hacker == req.session.currentUser._id || response.developer == req.session.currentUser._id){
+      if(response.hacker == req.session.currentUser._id){
         return Report.findByIdAndDelete(req.params.id)
           .then(()=>{return res.json('deleted')})
       }
@@ -65,17 +65,26 @@ router.post('/', (req, res, next) => {
     });
   }
 
+  if(!title || !dev || !description){
+    return res.status(422).json({
+      error: `Fields can't be empty`
+    });
+  }
+
   Dev.findOne({username: dev})
     .then((response) => {
       if(!response){
-        
+        return res.status(422).json({
+          error: `Dev "${dev}" does not exist`
+        });
       }
 
       const newReport = Report({
         title,
         description,
         developer: response._id,
-        hacker: req.session.currentUser._id
+        hacker: req.session.currentUser._id,
+        status: 'open'
       })
 
       return newReport.save().then(() => {
@@ -108,6 +117,28 @@ router.get('/',(req, res, next) => {
       })
   }
 });
+
+router.patch('/:id', (req, res, next) => {
+  if(!req.session.currentUser){
+    return res.status(401).json({
+      error: 'unauthorized'
+    });
+  }
+
+  const {newStatus} = req.body
+
+  Report.findById(req.params.id)
+    .then(response => {
+      if(response.developer == req.session.currentUser._id){
+        return Report.findByIdAndUpdate(req.params.id, { $set: { status: newStatus }})
+          .then(()=>{return res.json('changed status')})
+      }
+      return res.status(401).json({
+        error: 'unauthorized'
+    })
+    .catch(error => {console.log(error)});
+  })
+})
 
 
 module.exports = router;

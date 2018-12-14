@@ -28,7 +28,7 @@ router.post('/login', (req, res, next) => {
 
   if (!username || !password) {
     return res.status(422).json({
-      error: 'validation'
+      error: `Fields can't be empty`
     });
   }
 
@@ -41,7 +41,7 @@ router.post('/login', (req, res, next) => {
           .then(user => {
             if(!user){
               return res.status(404).json({
-                error: 'not-found'
+                error: 'Invalid username or password'
               });
             }
             if (bcrypt.compareSync(password, user.password)) {
@@ -49,7 +49,7 @@ router.post('/login', (req, res, next) => {
               return res.status(200).json(user);
             }
             return res.status(404).json({
-              error: 'not-found'
+              error: 'Invalid username or password'
             });
           })
       }else{
@@ -58,7 +58,7 @@ router.post('/login', (req, res, next) => {
           return res.status(200).json(user);
         }
         return res.status(404).json({
-          error: 'not-found'
+          error: 'Invalid username or password'
         });
       }
       
@@ -76,7 +76,7 @@ router.post('/signup', (req, res, next) => {
 
   if (!username || !password) {
     return res.status(422).json({
-      error: 'empty'
+      error: `Fields can't be empty.`
     });
   }
 
@@ -87,7 +87,7 @@ router.post('/signup', (req, res, next) => {
     .then((userExists) => {
       if (userExists) {
         return res.status(422).json({
-          error: 'username-not-unique'
+          error: 'Username already taken'
         });
       }
 
@@ -113,7 +113,7 @@ router.post('/signup', (req, res, next) => {
     .then((userExists) => {
       if (userExists) {
         return res.status(422).json({
-          error: 'username-not-unique'
+          error: 'Username already taken'
         });
       }
 
@@ -142,10 +142,5 @@ router.post('/logout', (req, res) => {
   return res.status(204).send();
 });
 
-router.get('/private', isLoggedIn(), (req, res, next) => {
-  res.status(200).json({
-    message: 'This is a private message'
-  });
-});
 
 module.exports = router;
