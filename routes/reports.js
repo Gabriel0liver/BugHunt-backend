@@ -7,6 +7,30 @@ const Report = require('../models/report');
 
 const { isLoggedIn } = require('../helpers/middlewares');
 
+router.get('/:id', (req, res, next) => {
+
+  if(!req.session.currentUser){
+    return res.status(401).json({
+      error: 'unauthorized'
+    });
+  }
+
+  Report.findById(req.params.id)
+    .then(response => {
+      if(response.hacker == req.session.currentUser._id || response.dev == req.session.currentUser._id){
+        const report = {
+          title: response.title,
+          description: response.description
+        }
+        return res.json(report)
+      }
+      return res.status(401).json({
+        error: 'unauthorized'
+      });
+    })
+    .catch(error => {console.log(error)});
+
+})
 
 router.post('/', (req, res, next) => {
   const {
@@ -20,8 +44,6 @@ router.post('/', (req, res, next) => {
       error: 'unauthorized'
     });
   }
-
-  console.log(req.body)
 
   Dev.findOne({username: dev})
     .then((response) => {
@@ -41,8 +63,30 @@ router.post('/', (req, res, next) => {
       });
     })
     .catch(error => {console.log(error)});
+});
 
-  
+router.get('/',(req, res, next) => {
+  const {
+    userType
+  } = req.body;
+
+  if(!req.session.currentUser){
+    return res.status(401).json({
+      error: 'unauthorized'
+    });
+  }
+
+  if(req.session.currentUser.type === 'hacker'){
+    Report.find({hacker: req.session.currentUser._id})
+      .then(response => {
+        res.json(response);
+      })
+  }else{
+    Report.find({developer: req.session.currentUser})
+      .then(response => {
+        res.json(response);
+      })
+  }
 });
 
 
