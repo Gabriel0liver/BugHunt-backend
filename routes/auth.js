@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
-const User = require('../models/user');
+const Dev = require('../models/dev');
+const Hacker = require('../models/hacker')
 
 const { isLoggedIn } = require('../helpers/middlewares');
 
@@ -31,23 +32,36 @@ router.post('/login', (req, res, next) => {
     });
   }
 
-  User.findOne({
+  Dev.findOne({
       username
     })
     .then((user) => {
       if (!user) {
+        Hacker.findOne({username})
+          .then(user => {
+            if(!user){
+              return res.status(404).json({
+                error: 'not-found'
+              });
+            }
+            if (bcrypt.compareSync(password, user.password)) {
+              req.session.currentUser = user;
+              return res.status(200).json(user);
+            }
+            return res.status(404).json({
+              error: 'not-found'
+            });
+          })
+      }else{
+        if (bcrypt.compareSync(password, user.password)) {
+          req.session.currentUser = user;
+          return res.status(200).json(user);
+        }
         return res.status(404).json({
           error: 'not-found'
         });
       }
-      // TODO async bcrypt
-      if (bcrypt.compareSync(password, user.password)) {
-        req.session.currentUser = user;
-        return res.status(200).json(user);
-      }
-      return res.status(404).json({
-        error: 'not-found'
-      });
+      
     })
     .catch(next);
 });
@@ -56,7 +70,8 @@ router.post('/login', (req, res, next) => {
 router.post('/signup', (req, res, next) => {
   const {
     username,
-    password
+    password,
+    type
   } = req.body;
 
   if (!username || !password) {
@@ -65,7 +80,8 @@ router.post('/signup', (req, res, next) => {
     });
   }
 
-  User.findOne({
+  if(type === 'hacker'){
+    Hacker.findOne({
       username
     }, 'username')
     .then((userExists) => {
@@ -78,17 +94,47 @@ router.post('/signup', (req, res, next) => {
       const salt = bcrypt.genSaltSync(10);
       const hashPass = bcrypt.hashSync(password, salt);
 
-      const newUser = User({
+      let newHacker = Hacker({
         username,
         password: hashPass,
+        type: 'hacker'
       });
 
-      return newUser.save().then(() => {
-        req.session.currentUser = newUser;
-        res.json(newUser);
+      return newHacker.save().then(() => {
+        req.session.currentUser = newHacker;
+        res.json(newHacker);
       });
     })
     .catch(next);
+  }else if(type === 'dev'){
+    Dev.findOne({
+      username
+    }, 'username')
+    .then((userExists) => {
+      if (userExists) {
+        return res.status(422).json({
+          error: 'username-not-unique'
+        });
+      }
+
+      const salt = bcrypt.genSaltSync(10);
+      const hashPass = bcrypt.hashSync(password, salt);
+
+      const newDev = Dev({
+        username,
+        password: hashPass,
+        type: 'dev'
+      });
+
+      return newDev.save().then(() => {
+        req.session.currentUser = newDev;
+        res.json(newDev);
+      });
+    })
+    .catch(next);
+  }
+
+  
 });
 
 router.post('/logout', (req, res) => {
