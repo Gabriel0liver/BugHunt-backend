@@ -17,7 +17,7 @@ router.get('/:id', (req, res, next) => {
 
   Report.findById(req.params.id)
     .then(response => {
-      if(response.hacker == req.session.currentUser._id || response.dev == req.session.currentUser._id){
+      if(response.hacker == req.session.currentUser._id || response.developer == req.session.currentUser._id){
         const report = {
           title: response.title,
           description: response.description
@@ -30,6 +30,26 @@ router.get('/:id', (req, res, next) => {
     })
     .catch(error => {console.log(error)});
 
+})
+
+router.delete('/:id', (req, res, next) => {
+  if(!req.session.currentUser){
+    return res.status(401).json({
+      error: 'unauthorized'
+    });
+  }
+
+  Report.findById(req.params.id)
+    .then(response => {
+      if(response.hacker == req.session.currentUser._id || response.developer == req.session.currentUser._id){
+        return Report.findByIdAndDelete(req.params.id)
+          .then(()=>{return res.json('deleted')})
+      }
+      return res.status(401).json({
+        error: 'unauthorized'
+    })
+    .catch(error => {console.log(error)});
+  })
 })
 
 router.post('/', (req, res, next) => {
