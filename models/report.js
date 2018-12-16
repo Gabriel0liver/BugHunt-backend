@@ -16,7 +16,7 @@ const reportSchema = new Schema({
     type: ObjectId,
     required: true
   },
-  developer:{
+  website:{
     type: ObjectId,
     required: true
   },

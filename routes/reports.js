@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const Hacker = require('../models/hacker');
+const Website = require('../models/website');
 const Dev = require('../models/dev');
 const Report = require('../models/report');
+
+const mongoose = require('mongoose');
 
 const { isLoggedIn } = require('../helpers/middlewares');
 
@@ -55,9 +57,11 @@ router.delete('/:id', (req, res, next) => {
 router.post('/', (req, res, next) => {
   const {
     title,
-    dev,
+    website,
     description
   } = req.body;
+
+  console.log(req.body)
 
   if(!req.session.currentUser){
     return res.status(401).json({
@@ -65,39 +69,26 @@ router.post('/', (req, res, next) => {
     });
   }
 
-  if(!title || !dev || !description){
+  if(!title || !website || !description){
     return res.status(422).json({
       error: `Fields can't be empty`
     });
   }
 
-  Dev.findOne({username: dev})
-    .then((response) => {
-      if(!response){
-        return res.status(422).json({
-          error: `Dev "${dev}" does not exist`
-        });
-      }
+  const newReport = Report({
+    title,
+    description,
+    website,
+    hacker: req.session.currentUser._id,
+    status: 'open'
+  })
 
-      const newReport = Report({
-        title,
-        description,
-        developer: response._id,
-        hacker: req.session.currentUser._id,
-        status: 'open'
-      })
-
-      return newReport.save().then(() => {
-        res.json(newReport);
-      });
-    })
-    .catch(error => {console.log(error)});
+  return newReport.save().then(() => {
+    res.json(newReport);
+  });
 });
 
-router.get('/',(req, res, next) => {
-  const {
-    userType
-  } = req.body;
+router.get('/',(req, res, next) => {  
 
   if(!req.session.currentUser){
     return res.status(401).json({
@@ -106,14 +97,29 @@ router.get('/',(req, res, next) => {
   }
 
   if(req.session.currentUser.type === 'hacker'){
-    Report.find({hacker: req.session.currentUser._id})
+    Report.find({hacker: req.session.currentUser._id })
       .then(response => {
         res.json(response);
       })
   }else{
-    Report.find({developer: req.session.currentUser})
-      .then(response => {
-        res.json(response);
+    Website.find({owner: req.session.currentUser._id})
+      .then(websites => {
+        const reports = []
+        async function asyncFun(callback){
+          for(let i = 0; i < websites.length; i++){
+            await Report.find({website: websites[i]._id})
+              .then(response => {
+               console.log(response)
+               response.forEach((data)=>{
+                reports.push(data)
+               })
+             })
+          }
+          callback()
+        }
+        asyncFun(()=>{
+          res.json(reports);
+        });  
       })
   }
 });
