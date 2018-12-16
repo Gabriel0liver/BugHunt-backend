@@ -19,16 +19,25 @@ router.get('/:id', (req, res, next) => {
 
   Report.findById(req.params.id)
     .then(response => {
-      if(response.hacker == req.session.currentUser._id || response.developer == req.session.currentUser._id){
-        const report = {
-          title: response.title,
-          description: response.description
-        }
+      const report = {
+        title: response.title,
+        description: response.description,
+        website: response.website,
+        status: response.status,
+        comment: response.comment
+      }
+      if(response.hacker == req.session.currentUser._id){
         return res.json(report)
       }
-      return res.status(401).json({
-        error: 'unauthorized'
-      });
+      Website.findById(response.website)
+        .then((website) => {
+          if(website.owner == req.session.currentUser._id){
+            return res.json(report)
+          }
+          return res.status(401).json({
+            error: 'unauthorized'
+          });
+        })
     })
     .catch(error => {console.log(error)});
 
@@ -131,19 +140,24 @@ router.patch('/:id', (req, res, next) => {
     });
   }
 
-  const {newStatus} = req.body
+  const {newStatus, comment} = req.body
+
+  console.log(comment)
 
   Report.findById(req.params.id)
     .then(response => {
-      if(response.developer == req.session.currentUser._id){
-        return Report.findByIdAndUpdate(req.params.id, { $set: { status: newStatus }})
-          .then(()=>{return res.json('changed status')})
-      }
-      return res.status(401).json({
-        error: 'unauthorized'
+      Website.findById(response.website)
+        .then((website) => {
+          if(website.owner == req.session.currentUser._id){
+            return Report.findByIdAndUpdate(req.params.id, { $set: { status: newStatus , comment}},)
+            .then(()=>{return res.json('changed status')})
+          }
+          return res.status(401).json({
+            error: 'unauthorized'
+          });
+        })
     })
     .catch(error => {console.log(error)});
-  })
 })
 
 

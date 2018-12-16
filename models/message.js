@@ -4,28 +4,17 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
 const reportSchema = new Schema({
-  title: {
+  text: {
     type: String,
     required: true,
   },
-  description: {
+  user: {
     type: String,
     required: true
   },
-  hacker:{
+  chatId:{
     type: ObjectId,
     required: true
-  },
-  website:{
-    type: ObjectId,
-    required: true
-  },
-  status:{
-    type: String,
-    required: true
-  },
-  comment:{
-    type: String
   }
 });
 

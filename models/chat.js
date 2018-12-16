@@ -4,28 +4,13 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
 const reportSchema = new Schema({
-  title: {
-    type: String,
+  devId: {
+    type: ObjectId,
     required: true,
   },
-  description: {
-    type: String,
-    required: true
-  },
-  hacker:{
+  hackerId: {
     type: ObjectId,
     required: true
-  },
-  website:{
-    type: ObjectId,
-    required: true
-  },
-  status:{
-    type: String,
-    required: true
-  },
-  comment:{
-    type: String
   }
 });
 
