@@ -32,6 +32,11 @@ router.post('/', (req, res, next) => {
         return res.status(401).json({
           error: 'chat already started with user'
         });
+      }else{
+        const newChat = Chat({
+          devId: req.session.currentUser._id,
+          hackerId
+        })
       }
     })
 
