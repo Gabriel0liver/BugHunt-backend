@@ -118,7 +118,6 @@ router.get('/',(req, res, next) => {
           for(let i = 0; i < websites.length; i++){
             await Report.find({website: websites[i]._id})
               .then(response => {
-               console.log(response)
                response.forEach((data)=>{
                 reports.push(data)
                })

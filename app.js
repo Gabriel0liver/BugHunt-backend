@@ -14,7 +14,7 @@ const auth = require('./routes/auth');
 const reports = require('./routes/reports');
 const websites = require('./routes/websites');
 const hackers = require('./routes/hackers');
-//const chats = require('./routes/chats');
+const chats = require('./routes/chats');
 
 mongoose.connect(process.env.MONGODB_URI, {
   keepAlive: true,
@@ -64,7 +64,7 @@ app.use('/auth', auth);
 app.use('/reports', reports);
 app.use('/websites', websites);
 app.use('/hackers', hackers);
-//app.use('/chats', chats);
+app.use('/chats', chats);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

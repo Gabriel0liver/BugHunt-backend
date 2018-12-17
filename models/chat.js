@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const ObjectId = Schema.Types.ObjectId;
 
-const reportSchema = new Schema({
+const chatSchema = new Schema({
   devId: {
     type: ObjectId,
     required: true,
@@ -14,6 +14,6 @@ const reportSchema = new Schema({
   }
 });
 
-const Report = mongoose.model('Report', reportSchema);
+const Chat = mongoose.model('Chat', chatSchema);
   
-module.exports = Report;
+module.exports = Chat;

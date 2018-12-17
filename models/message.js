@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const ObjectId = Schema.Types.ObjectId;
 
-const reportSchema = new Schema({
+const messageSchema = new Schema({
   text: {
     type: String,
     required: true,
@@ -15,9 +15,13 @@ const reportSchema = new Schema({
   chatId:{
     type: ObjectId,
     required: true
+  },
+  time: {
+    type: Number,
+    required: true
   }
 });
 
-const Report = mongoose.model('Report', reportSchema);
+const Message = mongoose.model('Message', messageSchema);
   
-module.exports = Report;
+module.exports = Message;
