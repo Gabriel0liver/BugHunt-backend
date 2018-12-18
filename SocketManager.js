@@ -8,7 +8,6 @@ class SocketManager {
 
   messageReceived(chatId){
     this.connectToNamespace(chatId);
-    console.log(this.socket)
     this.socket.emit("NEW_MESSAGE");
   }
  

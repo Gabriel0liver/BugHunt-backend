@@ -56,7 +56,8 @@ router.get('/:id', (req, res, next) => {
                 let type = "dev"
                 await Hacker.find({username: messageArray[i].user})
                   .then(hacker => {
-                    if(hacker.type){
+                    console.log(hacker)
+                    if(hacker[0]){
                       type = "hacker"
                     }
                   })
@@ -114,7 +115,35 @@ router.post('/', (req, res, next) => {
 });
 
 router.get('/',(req, res, next) => {  
-
+  Chat.find({ $or: [{devId: req.session.currentUser._id}, {hackerId: req.session.currentUser._id}]})
+    .then((chatList) => {
+      let formatedChats = []
+            async function asyncFunc (callback) {
+              for(let i = 0; i < chatList.length; i++){
+                let username = '';
+                if(req.session.currentUser.type==='dev'){
+                  await Hacker.findById(chatList[i].hackerId)
+                  .then(hacker => {
+                    username = hacker.username
+                  })
+                }else{
+                  await Dev.findById(chatList[i].devId)
+                  .then(dev => {
+                    username = dev.username
+                  })
+                }
+                
+                formatedChats.push({
+                  id: chatList[i]._id,
+                  username
+                })
+              }
+              callback();
+            }
+            asyncFunc(()=>{
+              res.json(formatedChats)
+            })
+    })
 });
 
 

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Website = require('../models/website');
-const Dev = require('../models/dev');
+const Hacker = require('../models/hacker');
 const Report = require('../models/report');
 
 const mongoose = require('mongoose');
@@ -18,28 +18,32 @@ router.get('/:id', (req, res, next) => {
   }
 
   Report.findById(req.params.id)
-    .then(response => {
-      const report = {
-        title: response.title,
-        description: response.description,
-        website: response.website,
-        status: response.status,
-        comment: response.comment
-      }
-      if(response.hacker == req.session.currentUser._id){
-        return res.json(report)
-      }
-      Website.findById(response.website)
-        .then((website) => {
-          if(website.owner == req.session.currentUser._id){
-            return res.json(report)
-          }
-          return res.status(401).json({
-            error: 'unauthorized'
-          });
-        })
-    })
-    .catch(error => {console.log(error)});
+  .then(response => {
+    Website.findById(response.website)
+      .then((website) => {
+        Hacker.findById(response.hacker)
+          .then((hacker => {
+            const report = {
+              title: response.title,
+              description: response.description,
+              website:  website.title,
+              hacker: hacker.username,
+              status: response.status,
+              comment: response.comment
+            }
+            if(response.hacker == req.session.currentUser._id){
+              return res.json(report)
+            }else if(website.owner == req.session.currentUser._id){
+              return res.json(report)
+            }
+            return res.status(401).json({
+              error: 'unauthorized'
+            });
+          }))
+      })
+  })
+  .catch(error => {console.log(error)});
+  
 
 })
 
