@@ -7,6 +7,10 @@ const Dev = require('../models/dev');
 const Report = require('../models/report');
 const Message = require('../models/message')
 
+const SocketManager = require("../SocketManager");
+
+
+
 const mongoose = require('mongoose');
 
 const { isLoggedIn } = require('../helpers/middlewares');
@@ -28,6 +32,7 @@ router.post('/:id', (req, res, next) => {
           time: Date.now()
         })
         return NewMessage.save().then(() => {
+          SocketManager.messageReceived(req.params.id)
           res.json(NewMessage);
         });
       }
@@ -43,7 +48,6 @@ router.get('/:id', (req, res, next) => {
           error: 'no no no'
         });
       }else{
-        console.log('test')
         Message.find({chatId: req.params.id})
           .then((messageArray)=>{
             let formatedMessages = []
@@ -66,8 +70,8 @@ router.get('/:id', (req, res, next) => {
               callback();
             }
             asyncFunc(()=>{
-              console.log('hey')
               res.json(formatedMessages)
+              
             })
           })
       }
@@ -93,7 +97,6 @@ router.post('/', (req, res, next) => {
         Hacker.findById(hackerId)
           .then((hacker) => {
             if(hacker === null){
-              console.log(hackerId)
               return res.status(401).json({
                 error: `hacker dosen't exist`
               });
