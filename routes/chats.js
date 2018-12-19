@@ -65,7 +65,6 @@ router.get('/:id', (req, res, next) => {
                 let type = "dev"
                 await Hacker.find({username: messageArray[i].user})
                   .then(hacker => {
-                    console.log(hacker)
                     if(hacker[0]){
                       type = "hacker"
                     }
@@ -97,7 +96,7 @@ router.post('/', (req, res, next) => {
     });
   }
 
-  Chat.find({hackerId})
+  Chat.find({ $and: [{hackerId},{devId: req.session.currentUser._id}]})
     .then((response) => {
       if(response.length !== 0){
         return res.status(401).json({
@@ -106,6 +105,7 @@ router.post('/', (req, res, next) => {
       }else{
         Hacker.findById(hackerId)
           .then((hacker) => {
+            
             if(hacker === null){
               return res.status(401).json({
                 error: `hacker dosen't exist`
@@ -124,7 +124,7 @@ router.post('/', (req, res, next) => {
             };
             transporter.sendMail(mailOptions, function (err, info) {if(err){console.log(err)}});
             return newChat.save().then(() => {
-              res.json(newChat);
+              res.json(newChat._id);
               SocketManager.messageReceived(newChat._id)
             });
           })
