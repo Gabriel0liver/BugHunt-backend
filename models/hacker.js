@@ -10,8 +10,18 @@ const hackerSchema = new Schema({
   password: {
     type: String,
     required: true
-  },type: {
+  },
+  email: {
     type: String,
+    required: true,
+    unique: true
+  },
+  type: {
+    type: String,
+    required: true
+  },
+  points: {
+    type: Number,
     required: true
   }
 });

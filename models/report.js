@@ -26,6 +26,10 @@ const reportSchema = new Schema({
   },
   comment:{
     type: String
+  },
+  points:{
+    type: Number,
+    required: true
   }
 });
 

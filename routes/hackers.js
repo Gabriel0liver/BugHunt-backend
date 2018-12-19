@@ -5,7 +5,13 @@ const Website = require('../models/website');
 const Hacker = require('../models/hacker');
 const Report = require('../models/report');
 
-router.get('/',(req, res, next) => {  
+var nodemailer = require('nodemailer');
+require('dotenv').config();
+
+router.get('/',(req, res, next) => {
+
+ 
+  
 
   if(!req.session.currentUser){
     return res.status(401).json({
@@ -17,10 +23,11 @@ router.get('/',(req, res, next) => {
     Hacker.find()
       .then(response => {
         const hackerList = response.map(hacker => {
-          const {username, _id} = hacker
+          const {username, _id, points} = hacker
           return {
             username,
-            _id
+            _id,
+            points
           }
         })
         res.json(hackerList);

@@ -69,12 +69,13 @@ router.post('/login', (req, res, next) => {
 
 router.post('/signup', (req, res, next) => {
   const {
+    email,
     username,
     password,
     type
   } = req.body;
 
-  if (!username || !password) {
+  if (!username || !password || !email) {
     return res.status(422).json({
       error: `Fields can't be empty.`
     });
@@ -90,22 +91,31 @@ router.post('/signup', (req, res, next) => {
           error: 'Username already taken'
         });
       }
-
-      const salt = bcrypt.genSaltSync(10);
-      const hashPass = bcrypt.hashSync(password, salt);
-
-      let newHacker = Hacker({
-        username,
-        password: hashPass,
-        type: 'hacker'
-      });
-
-      return newHacker.save().then(() => {
-        req.session.currentUser = newHacker;
-        res.json(newHacker);
-      });
-    })
-    .catch(next);
+      Hacker.findOne({email})
+        .then((emailExists) => {
+          if(emailExists){
+            return res.status(422).json({
+              error: 'Email already in use'
+            });
+          }
+          const salt = bcrypt.genSaltSync(10);
+          const hashPass = bcrypt.hashSync(password, salt);
+    
+          let newHacker = Hacker({
+            email,
+            username,
+            password: hashPass,
+            type: 'hacker',
+            points: 0
+          });
+    
+          return newHacker.save().then(() => {
+            req.session.currentUser = newHacker;
+            res.json(newHacker);
+          });
+        })
+        .catch(next);
+        })  
   }else if(type === 'dev'){
     Dev.findOne({
       username
@@ -116,11 +126,18 @@ router.post('/signup', (req, res, next) => {
           error: 'Username already taken'
         });
       }
-
-      const salt = bcrypt.genSaltSync(10);
+      Hacker.findOne({email})
+        .then((emailExists) => {
+          if(emailExists){
+            return res.status(422).json({
+              error: 'Email already in use'
+            });
+          }
+          const salt = bcrypt.genSaltSync(10);
       const hashPass = bcrypt.hashSync(password, salt);
 
       const newDev = Dev({
+        email,
         username,
         password: hashPass,
         type: 'dev'
@@ -129,6 +146,9 @@ router.post('/signup', (req, res, next) => {
       return newDev.save().then(() => {
         req.session.currentUser = newDev;
         res.json(newDev);
+        })
+
+      
       });
     })
     .catch(next);

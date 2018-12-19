@@ -80,6 +80,7 @@ router.post('/', (req, res, next) => {
 });
 	
 router.get('/',(req, res, next) => {
+  if(req.session.currentUser.type === 'hacker'){
   Website.find()
 		.then(response => {
 			response.map(website => {
@@ -89,7 +90,19 @@ router.get('/',(req, res, next) => {
         }
       })
       res.json(response);
-		})
+    })
+  }else if(req.session.currentUser.type === 'dev'){
+    Website.find({owner: req.session.currentUser._id})
+		.then(response => {
+			response.map(website => {
+				return {
+          title: website.title,
+          id: website._id
+        }
+      })
+      res.json(response);
+    })
+  }
 			
 });
 

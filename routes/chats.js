@@ -9,11 +9,20 @@ const Message = require('../models/message')
 
 const SocketManager = require("../SocketManager");
 
+var nodemailer = require('nodemailer');
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+         user: process.env.GMAIL,
+         pass: process.env.PASSWORD
+     }
+ });
 
 const mongoose = require('mongoose');
 
 const { isLoggedIn } = require('../helpers/middlewares');
+
 
 router.post('/:id', (req, res, next) => {
   const { message } = req.body
@@ -106,8 +115,17 @@ router.post('/', (req, res, next) => {
               devId: req.session.currentUser._id,
               hackerId
             })
+            const mailOptions = {
+              from: 'bug-hunt-notifications@gmail.com', // sender address
+              to: hacker.email, // list of receivers
+              subject: 'A chat has been open with you', // Subject line
+              html: `<h4>The developer ${req.session.currentUser.username} has opened a chat with you.</h4>
+              <h4>Go to https://bug-hunt-website.firebaseapp.com/chats to chat with the dev. </h4>`// plain text body
+            };
+            transporter.sendMail(mailOptions, function (err, info) {if(err){console.log(err)}});
             return newChat.save().then(() => {
               res.json(newChat);
+              SocketManager.messageReceived(newChat._id)
             });
           })
       }
@@ -145,6 +163,5 @@ router.get('/',(req, res, next) => {
             })
     })
 });
-
 
 module.exports = router;
