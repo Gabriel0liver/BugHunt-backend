@@ -42,7 +42,13 @@ router.post('/:id', (req, res, next) => {
         })
         return NewMessage.save().then(() => {
           SocketManager.messageReceived(req.params.id)
-          res.json(NewMessage);
+          const sendMessage={
+            username: NewMessage.user,
+            time: NewMessage.time,
+            text: NewMessage.text,
+            type: NewMessage.type
+          }
+          res.json(sendMessage);
         });
       }
     })
