@@ -183,7 +183,7 @@ router.patch('/:id', (req, res, next) => {
   Report.findById(req.params.id)
     .then(response => {
       Website.findById(response.website)
-        .then((website) => {status
+        .then((website) => {
           if(website.owner == req.session.currentUser._id && newStatus === 'open'){
             Hacker.findById(response.hacker)
             .then((hacker)=>{

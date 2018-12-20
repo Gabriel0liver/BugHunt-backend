@@ -34,6 +34,8 @@ router.get('/',(req, res, next) => {
                     _id,
                     points
                   })
+
+                  
                 }
               })
             
@@ -41,6 +43,7 @@ router.get('/',(req, res, next) => {
           callback()
         }
         asyncFunc(()=>{
+          console.log(hackerList)
           res.json(hackerList);
         })
       })
