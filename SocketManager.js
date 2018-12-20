@@ -14,6 +14,7 @@ class SocketManager {
   connectToNamespace (nsp){
     this.socket = this.io.of('/'+nsp);
     this.socket.on('connection', (sk) => {
+      console.log('user connected')
     });
     return;
   }
