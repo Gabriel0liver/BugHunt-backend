@@ -4,7 +4,6 @@ const router = express.Router();
 const Chat = require('../models/chat');
 const Hacker = require('../models/hacker');
 const Dev = require('../models/dev');
-const Report = require('../models/report');
 const Message = require('../models/message')
 
 const SocketManager = require("../SocketManager");
@@ -18,11 +17,6 @@ const transporter = nodemailer.createTransport({
          pass: process.env.PASSWORD
      }
  });
-
-const mongoose = require('mongoose');
-
-const { isLoggedIn } = require('../helpers/middlewares');
-
 
 router.post('/:id', (req, res, next) => {
   const { message } = req.body

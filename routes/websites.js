@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const Hacker = require('../models/hacker');
 const Dev = require('../models/dev');
 const Website = require('../models/website');
-
-const { isLoggedIn } = require('../helpers/middlewares');
 
 router.get('/:id', (req, res, next) => {
 

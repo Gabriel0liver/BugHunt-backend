@@ -1,18 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const Website = require('../models/website');
 const Hacker = require('../models/hacker');
 const Chat = require('../models/chat');
 
-var nodemailer = require('nodemailer');
 require('dotenv').config();
 
 router.get('/',(req, res, next) => {
-
- 
   
-
   if(!req.session.currentUser){
     return res.status(401).json({
       error: 'unauthorized'

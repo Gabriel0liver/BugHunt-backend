@@ -5,8 +5,6 @@ const bcrypt = require('bcrypt');
 const Dev = require('../models/dev');
 const Hacker = require('../models/hacker')
 
-const { isLoggedIn } = require('../helpers/middlewares');
-
 router.get('/me', (req, res, next) => {
   if (req.session.currentUser) {
     res.json(req.session.currentUser);

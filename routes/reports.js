@@ -6,10 +6,6 @@ const Hacker = require('../models/hacker');
 const Report = require('../models/report');
 const Dev = require('../models/dev');
 
-const mongoose = require('mongoose');
-
-const { isLoggedIn } = require('../helpers/middlewares');
-
 var nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
