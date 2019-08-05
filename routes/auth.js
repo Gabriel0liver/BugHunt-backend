@@ -34,6 +34,7 @@ router.post('/login', (req, res, next) => {
       username
     })
     .then((user) => {
+      console.log('test')
       if (!user) {
         Hacker.findOne({username})
           .then(user => {
