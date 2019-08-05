@@ -16,11 +16,16 @@ router.get('/me', (req, res, next) => {
 });
 
 router.post('/login', (req, res, next) => {
+
+  console.log('test1')
+
   if (req.session.currentUser) {
     return res.status(401).json({
       error: 'unauthorized'
     });
   }
+
+  console.log('test2')
 
   const { username, password } = req.body;
 
@@ -30,11 +35,13 @@ router.post('/login', (req, res, next) => {
     });
   }
 
+  console.log('test3')
+
   Dev.findOne({
       username
     })
     .then((user) => {
-      console.log('test')
+      console.log('test4')
       if (!user) {
         Hacker.findOne({username})
           .then(user => {
